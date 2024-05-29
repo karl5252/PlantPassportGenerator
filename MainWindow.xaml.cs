@@ -189,6 +189,15 @@ namespace PlantPassportGenerator
             var pdfGenerator = new PdfGenerator(_plantPassports, _basket);
             pdfGenerator.GeneratePdf();
         }
+        private void CleanButton_Click(object sender, RoutedEventArgs e)
+        {
+            // clean basket items
+            // refresh basket
+            _basket.Clear();
+            BasketListBox.Items.Refresh();
+           
+
+        }
 
 
         private void FilterTextBox_TextChanged(object sender, TextChangedEventArgs e)

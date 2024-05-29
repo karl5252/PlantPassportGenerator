@@ -7,7 +7,7 @@ using CsvHelper;
 using PlantPassportGenerator;
 using System.Globalization;
 using WpfApp1.Model;
-using System.Linq;
+using System;
 
 namespace WpfApp1.Util
 {
@@ -34,29 +34,28 @@ namespace WpfApp1.Util
                     using (var reader = new StreamReader(csvFilePath))
                     using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
-                        csv.Context.RegisterClassMap<PlantPassportMap>();
-                        var records = csv.GetRecords<PlantPassport>().ToList();
-                        _mainWindow.UpdatePlantPassports(records);
+                        var records = csv.GetRecords<PlantPassport>();
+                        List<PlantPassport> data = new List<PlantPassport>(records);
+                        _mainWindow.UpdatePlantPassports(data);
 
-                        File.WriteAllText(jsonFilePath, JsonConvert.SerializeObject(records, Formatting.Indented));
+                        File.WriteAllText(jsonFilePath, JsonConvert.SerializeObject(data, Formatting.Indented));
                     }
                 }
-                catch (CsvHelperException ex)
+                catch (Exception ex)
                 {
-                    MessageBox.Show($"Error importing CSV: {ex.Message}\nPlease ensure all fields are filled, even with placeholder data.", "Import Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"The CSV file could not be processed. Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+
             }
         }
 
 
-
         private void ExportToCSV_Click(object sender, RoutedEventArgs e)
-    {
-            
-        // Implement CSV export functionality here
-    }
+        {
+            // Implement CSV export functionality here
+        }
 
-}
+    }
 
 
 }

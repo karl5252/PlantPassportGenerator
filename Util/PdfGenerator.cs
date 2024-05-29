@@ -79,9 +79,15 @@ public class PdfGenerator
             }
         }
 
-        string filename = "PlantPassports.pdf";
-        document.Save(filename);
-        MessageBox.Show($"PDF saved as {filename}");
+        string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        string directoryPath = Path.Combine(documentsPath, "PlantPassporten");
+        Directory.CreateDirectory(directoryPath); // Creates the directory if it doesn't exist
+
+        string filename = $"PlantPassport_{DateTime.Now:ddMMyyyyHHmmss}.pdf";
+        string filePath = Path.Combine(directoryPath, filename);
+
+        document.Save(filePath);
+        MessageBox.Show($"PDF saved as {filePath}");
     }
 
 }
