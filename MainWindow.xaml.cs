@@ -50,6 +50,14 @@ namespace PlantPassportGenerator
             RefreshCollectionView();
         }
 
+        public void UpdatePlantSectors(List<string> newSectors)
+        {
+            _sectors.AddRange(newSectors);
+            SaveSectors();
+            LoadSectors();
+            RefreshCollectionView();
+        }
+
         private void LoadSectors()
         {
             if (File.Exists(SectorsFilePath))
