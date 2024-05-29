@@ -1,0 +1,25 @@
+﻿<Window x:Class="PlantPassportGenerator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Plant Passport Generator" Height="450" Width="800">
+    <Grid>
+        <StackPanel Orientation="Vertical" Margin="10">
+            <TextBox x:Name="PlantNameTextBox" Text="Plant Name" Margin="5"/>
+            <TextBox x:Name="SpeciesTextBox" Text="Species" Margin="5"/>
+            <TextBox x:Name="OriginTextBox" Text="Origin" Margin="5"/>
+            <Button x:Name="AddButton" Content="Add" Click="AddButton_Click" Margin="5"/>
+            <Button x:Name="UpdateButton" Content="Update" Click="UpdateButton_Click" Margin="5"/>
+            <Button x:Name="DeleteButton" Content="Delete" Click="DeleteButton_Click" Margin="5"/>
+            <Button x:Name="PrintButton" Content="Print" Click="PrintButton_Click" Margin="5"/>
+            <DataGrid x:Name="PlantDataGrid" AutoGenerateColumns="False" Margin="5" IsReadOnly="True" SelectionChanged="PlantDataGrid_SelectionChanged">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                    <DataGridTextColumn Header="Plant Name" Binding="{Binding PlantName}" Width="150"/>
+                    <DataGridTextColumn Header="Species" Binding="{Binding Species}" Width="150"/>
+                    <DataGridTextColumn Header="Origin" Binding="{Binding Origin}" Width="150"/>
+                    <DataGridTextColumn Header="Date Added" Binding="{Binding DateAdded}" Width="150"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+    </Grid>
+</Window>
