@@ -28,15 +28,18 @@ namespace WpfApp1.Util
                     string csvFilePath = openFileDialog.FileName;
                     string jsonFilePath = Path.ChangeExtension(csvFilePath, ".json");
 
-                    using (var reader = new StreamReader(csvFilePath))
-                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-                    {
-                        var records = csv.GetRecords<PlantPassport>();
-                        List<PlantPassport> data = new List<PlantPassport>(records);
-                    var test = 0;
-                    }
+                using (var reader = new StreamReader(csvFilePath))
+                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    var records = csv.GetRecords<PlantPassport>();
+                    List<PlantPassport> data = new List<PlantPassport>(records);
+                    _mainWindow.UpdatePlantPassports(data);
+
+                    File.WriteAllText(jsonFilePath, JsonConvert.SerializeObject(data, Formatting.Indented));
                 }
+                
             }
+    }
         
 
     private void ExportToCSV_Click(object sender, RoutedEventArgs e)
@@ -46,5 +49,5 @@ namespace WpfApp1.Util
 
 }
 
-   
+
 }

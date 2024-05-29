@@ -38,6 +38,17 @@ namespace PlantPassportGenerator
             LoadSectors();
             BasketListBox.ItemsSource = _basket;
         }
+        /// <summary>
+        /// Interact with the PlantPassports property
+        /// </summary>
+        /// <param name="newPassports"></param>
+        public void UpdatePlantPassports(List<PlantPassport> newPassports)
+        {
+            _plantPassports.Clear();
+            _plantPassports.AddRange(newPassports);
+            _jsonDatabaseService.SaveData(_plantPassports);
+            RefreshCollectionView();
+        }
 
         private void LoadSectors()
         {

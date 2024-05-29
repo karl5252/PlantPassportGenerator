@@ -36,7 +36,7 @@ public class PdfGenerator
         PdfDocument document = new PdfDocument();
         document.Info.Title = "Plant Passports";
 
-        int passportsPerPage = 10; // 5 rows * 3 columns
+        int passportsPerPage = 10; // 5 rows * 2 columns
         int passportCounter = 0;
 
         PdfPage page = null;
@@ -58,12 +58,13 @@ public class PdfGenerator
                     page.Size = PdfSharp.PageSize.A4;
                     gfx = XGraphics.FromPdfPage(page);
                 }
-                int row = (passportCounter % passportsPerPage) / 3;
+
+                int row = (passportCounter % passportsPerPage) / 2;
                 int column = (passportCounter % passportsPerPage) % 2;
 
-                double x = 40 + column * (230 + 30); // 2.5cm (around 70 points) + 5cm (around 140 points) + margin
-                double y = 40 + row * (100 + 55); // 2.5cm (around 70 points) + 5cm (around 140 points) + margin
-                
+                double x = 40 + column * (230 + 30); // x position with spacing for 2 columns
+                double y = 40 + row * (150 + 10); // y position with spacing for 5 rows
+
                 gfx.DrawImage(_euFlag, x, y, 80, 50); // Draw flag
 
                 gfx.DrawString("Paszport roślin / Plant passport", font, XBrushes.Black, new XRect(x + 85, y, 140, 20), XStringFormats.TopLeft);
@@ -82,4 +83,5 @@ public class PdfGenerator
         document.Save(filename);
         MessageBox.Show($"PDF saved as {filename}");
     }
+
 }

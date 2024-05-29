@@ -19,7 +19,7 @@
         <Menu Grid.ColumnSpan="3" Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="IMPORT from CSV" Click="ImportFromCSV_Click"/>
-                <MenuItem Header="EXPORT to CSV" Click="ExportToCSV_Click"/>
+                <MenuItem Header="EXPORT to CSV" Click="ExportToCSV_Click" IsEnabled="False"/>
             </MenuItem>
         </Menu>
 
