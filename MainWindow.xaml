@@ -7,7 +7,12 @@
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" Orientation="Vertical" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical" Margin="10">
             <TextBox x:Name="PlantNameTextBox" Text="Plant Name" Margin="5"/>
             <TextBox x:Name="IdTextBox" Text="Id" Margin="5"/>
             <ComboBox x:Name="SectorComboBox" Margin="5"/>
@@ -15,7 +20,10 @@
             <Button x:Name="UpdateButton" Content="Update" Click="UpdateButton_Click" Margin="5"/>
             <Button x:Name="DeleteButton" Content="Delete" Click="DeleteButton_Click" Margin="5"/>
             <Button x:Name="PrintButton" Content="Print" Click="PrintButton_Click" Margin="5"/>
-            <DataGrid x:Name="PlantDataGrid" AutoGenerateColumns="False" Margin="5" IsReadOnly="True" SelectionChanged="PlantDataGrid_SelectionChanged">
+        </StackPanel>
+
+        <ScrollViewer Grid.Column="0" Grid.Row="1" Margin="10">
+            <DataGrid x:Name="PlantDataGrid" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="PlantDataGrid_SelectionChanged">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="150"/>
                     <DataGridTextColumn Header="Plant Name" Binding="{Binding PlantName}" Width="250"/>
@@ -23,8 +31,9 @@
                     <DataGridTextColumn Header="Date Added" Binding="{Binding DateAdded}"/>
                 </DataGrid.Columns>
             </DataGrid>
-        </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10">
+        </ScrollViewer>
+
+        <StackPanel Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" Margin="10">
             <TextBlock Text="Manage Sectors" Margin="5"/>
             <TextBox x:Name="SectorTextBox" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Margin="5" Height="300"/>
             <Button x:Name="RefreshSectorsButton" Content="Refresh Sectors" Click="RefreshSectorsButton_Click" Margin="5"/>
