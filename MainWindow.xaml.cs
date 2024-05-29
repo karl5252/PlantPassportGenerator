@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Newtonsoft.Json;
 using System.IO;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
-using WpfApp1.Model;
-using WpfApp1;
 
 namespace PlantPassportGenerator
 {
@@ -17,13 +16,17 @@ namespace PlantPassportGenerator
         private List<PlantPassport> _plantPassports;
         private JsonDatabaseService _jsonDatabaseService;
         private const string DatabaseFilePath = "plant_passports.json";
+        private CollectionViewSource _collectionViewSource;
 
         public MainWindow()
         {
             InitializeComponent();
             _jsonDatabaseService = new JsonDatabaseService(DatabaseFilePath);
             _plantPassports = _jsonDatabaseService.LoadData();
-            PlantDataGrid.ItemsSource = _plantPassports;
+
+            _collectionViewSource = new CollectionViewSource { Source = _plantPassports };
+            _collectionViewSource.Filter += CollectionViewSource_Filter;
+            PlantDataGrid.ItemsSource = _collectionViewSource.View;
 
             LoadSectors();
         }
@@ -51,7 +54,7 @@ namespace PlantPassportGenerator
 
             _plantPassports.Add(newPassport);
             _jsonDatabaseService.SaveData(_plantPassports);
-            PlantDataGrid.Items.Refresh();
+            RefreshCollectionView();
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
@@ -61,7 +64,7 @@ namespace PlantPassportGenerator
                 selectedPassport.PlantName = PlantNameTextBox.Text;
                 selectedPassport.Sector = SectorComboBox.SelectedItem?.ToString();
                 _jsonDatabaseService.SaveData(_plantPassports);
-                PlantDataGrid.Items.Refresh();
+                RefreshCollectionView();
             }
         }
 
@@ -71,7 +74,7 @@ namespace PlantPassportGenerator
             {
                 _plantPassports.Remove(selectedPassport);
                 _jsonDatabaseService.SaveData(_plantPassports);
-                PlantDataGrid.Items.Refresh();
+                RefreshCollectionView();
             }
         }
 
@@ -127,6 +130,71 @@ namespace PlantPassportGenerator
             string filename = "PlantPassports.pdf";
             document.Save(filename);
             MessageBox.Show($"PDF saved as {filename}");
+        }
+
+        private void FilterTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            RefreshCollectionView();
+        }
+
+        private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
+        {
+            if (e.Item is PlantPassport passport)
+            {
+                if (string.IsNullOrWhiteSpace(FilterTextBox.Text))
+                {
+                    e.Accepted = true;
+                }
+                else
+                {
+                    e.Accepted = passport.PlantName.IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                 passport.Id.ToString().IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                 passport.Sector.IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0;
+                }
+            }
+        }
+
+        private void RefreshCollectionView()
+        {
+            if (_collectionViewSource?.View != null)
+            {
+                _collectionViewSource.View.Refresh();
+            }
+        }
+    }
+
+    public class PlantPassport
+    {
+        public String Id { get; set; }
+        public string PlantName { get; set; }
+        public string Sector { get; set; }
+        public DateTime DateAdded { get; set; } = DateTime.Now;
+    }
+
+    public class JsonDatabaseService
+    {
+        private readonly string _filePath;
+
+        public JsonDatabaseService(string filePath)
+        {
+            _filePath = filePath;
+        }
+
+        public List<PlantPassport> LoadData()
+        {
+            if (File.Exists(_filePath))
+            {
+                string json = File.ReadAllText(_filePath);
+                return JsonConvert.DeserializeObject<List<PlantPassport>>(json) ?? new List<PlantPassport>();
+            }
+
+            return new List<PlantPassport>();
+        }
+
+        public void SaveData(List<PlantPassport> data)
+        {
+            string json = JsonConvert.SerializeObject(data, Formatting.Indented);
+            File.WriteAllText(_filePath, json);
         }
     }
 }

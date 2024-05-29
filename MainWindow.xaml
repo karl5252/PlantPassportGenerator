@@ -20,6 +20,7 @@
             <Button x:Name="UpdateButton" Content="Update" Click="UpdateButton_Click" Margin="5"/>
             <Button x:Name="DeleteButton" Content="Delete" Click="DeleteButton_Click" Margin="5"/>
             <Button x:Name="PrintButton" Content="Print" Click="PrintButton_Click" Margin="5"/>
+            <TextBox x:Name="FilterTextBox" Text="Filter" Margin="5" TextChanged="FilterTextBox_TextChanged"/>
         </StackPanel>
 
         <ScrollViewer Grid.Column="0" Grid.Row="1" Margin="10">
