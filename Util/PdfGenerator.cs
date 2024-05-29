@@ -5,6 +5,7 @@ using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using System.Windows;
 using PlantPassportGenerator;
+using WpfApp1.Model;
 
 public class PdfGenerator
 {
@@ -16,6 +17,15 @@ public class PdfGenerator
         _plantPassports = plantPassports;
         _basket = basket;
     }
+
+   /* public PdfGenerator(List<PlantPassport> plantPassports, List<BasketItem> basket)
+    {
+        PlantPassports = plantPassports;
+        Basket = basket;
+    }
+    */
+    public List<PlantPassport> PlantPassports { get; }
+    public List<BasketItem> Basket { get; }
 
     public void GeneratePdf()
     {
@@ -52,7 +62,7 @@ public class PdfGenerator
                 double y = 40 + row * (100 + 20); // 2.5cm (around 70 points) + 5cm (around 140 points)
 
                 gfx.DrawString("EU", boldFont, XBrushes.Black, new XRect(x, y, 70, 20), XStringFormats.TopLeft);
-                gfx.DrawString("Paszport rolin / Plant passport", font, XBrushes.Black, new XRect(x + 70, y, 140, 20), XStringFormats.TopLeft);
+                gfx.DrawString("Paszport roslin / Plant passport", font, XBrushes.Black, new XRect(x + 70, y, 140, 20), XStringFormats.TopLeft);
 
                 gfx.DrawString($"A: {passport.PlantName}", font, XBrushes.Black, new XRect(x, y + 20, 210, 20), XStringFormats.TopLeft);
                 gfx.DrawString($"B: {passport.Id}", font, XBrushes.Black, new XRect(x, y + 40, 210, 20), XStringFormats.TopLeft);

@@ -6,8 +6,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Newtonsoft.Json;
 using System.IO;
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
+using WpfApp1.Model;
+using WpfApp1.Util;
 
 namespace PlantPassportGenerator
 {
@@ -208,44 +208,5 @@ namespace PlantPassportGenerator
         }
     }
 
-    public class PlantPassport
-    {
-        public string Id { get; set; }
-        public string PlantName { get; set; }
-        public string Sector { get; set; }
-        public DateTime DateAdded { get; set; } = DateTime.Now;
-    }
-
-    public class BasketItem
-    {
-        public string PlantName { get; set; }
-        public int Count { get; set; }
-    }
-
-    public class JsonDatabaseService
-    {
-        private readonly string _filePath;
-
-        public JsonDatabaseService(string filePath)
-        {
-            _filePath = filePath;
-        }
-
-        public List<PlantPassport> LoadData()
-        {
-            if (File.Exists(_filePath))
-            {
-                string json = File.ReadAllText(_filePath);
-                return JsonConvert.DeserializeObject<List<PlantPassport>>(json) ?? new List<PlantPassport>();
-            }
-
-            return new List<PlantPassport>();
-        }
-
-        public void SaveData(List<PlantPassport> data)
-        {
-            string json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            File.WriteAllText(_filePath, json);
-        }
-    }
+   
 }
