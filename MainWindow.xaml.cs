@@ -14,8 +14,10 @@ namespace PlantPassportGenerator
     public partial class MainWindow : Window
     {
         private List<PlantPassport> _plantPassports;
+        private List<string> _sectors;
         private JsonDatabaseService _jsonDatabaseService;
         private const string DatabaseFilePath = "plant_passports.json";
+        private const string SectorsFilePath = "sectors.json";
         private CollectionViewSource _collectionViewSource;
 
         public MainWindow()
@@ -29,18 +31,59 @@ namespace PlantPassportGenerator
             PlantDataGrid.ItemsSource = _collectionViewSource.View;
 
             LoadSectors();
+
+            // Ensure FilterTextBox is empty or has only placeholder text
+            FilterTextBox.Text = string.Empty;
+
+            // Refresh the CollectionViewSource
+            _collectionViewSource.View.Refresh();
         }
 
         private void LoadSectors()
         {
-            // Load sectors from the multiline TextBox
-            var sectors = SectorTextBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None).Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
-            SectorComboBox.ItemsSource = sectors;
+            if (File.Exists(SectorsFilePath))
+            {
+                string json = File.ReadAllText(SectorsFilePath);
+                _sectors = JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
+            }
+            else
+            {
+                _sectors = new List<string>();
+            }
+            SectorComboBox.ItemsSource = _sectors;
+            SectorListBox.ItemsSource = _sectors;
         }
 
-        private void RefreshSectorsButton_Click(object sender, RoutedEventArgs e)
+        private void SaveSectors()
         {
-            LoadSectors();
+            string json = JsonConvert.SerializeObject(_sectors, Formatting.Indented);
+            File.WriteAllText(SectorsFilePath, json);
+        }
+
+        private void AddSectorButton_Click(object sender, RoutedEventArgs e)
+        {
+            string newSector = NewSectorTextBox.Text.Trim();
+            if (!string.IsNullOrEmpty(newSector) && !_sectors.Contains(newSector))
+            {
+                _sectors.Add(newSector);
+                SaveSectors();
+                LoadSectors();
+            }
+        }
+
+        private void DeleteSectorButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SectorListBox.SelectedItem is string selectedSector)
+            {
+                _sectors.Remove(selectedSector);
+                SaveSectors();
+                LoadSectors();
+            }
+        }
+
+        private void SectorListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Optional: Handle selection change if needed
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -101,7 +144,7 @@ namespace PlantPassportGenerator
             XFont font = new XFont("Verdana", 10, XFontStyleEx.Regular);
             XFont boldFont = new XFont("Verdana", 10, XFontStyleEx.Bold);
 
-            foreach (PlantPassport passport in PlantDataGrid.SelectedItems)
+            foreach (PlantPassport passport in BasketListBox.Items)
             {
                 if (passportCounter % passportsPerPage == 0)
                 {
@@ -149,7 +192,7 @@ namespace PlantPassportGenerator
                 {
                     e.Accepted = passport.PlantName.IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
                                  passport.Id.ToString().IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                                 passport.Sector.IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0;
+                                 passport.Sector?.IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0;
                 }
             }
         }
@@ -165,7 +208,7 @@ namespace PlantPassportGenerator
 
     public class PlantPassport
     {
-        public String Id { get; set; }
+        public string Id { get; set; }
         public string PlantName { get; set; }
         public string Sector { get; set; }
         public DateTime DateAdded { get; set; } = DateTime.Now;
