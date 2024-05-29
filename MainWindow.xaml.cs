@@ -30,10 +30,10 @@ namespace PlantPassportGenerator
         {
             var newPassport = new PlantPassport
             {
-                Id = _plantPassports.Count > 0 ? _plantPassports.Max(p => p.Id) + 1 : 1,
+                //Id = _plantPassports.Count > 0 ? _plantPassports.Max(p => p.Id) + 1 : 1,
                 PlantName = PlantNameTextBox.Text,
-                Species = SpeciesTextBox.Text,
-                Origin = OriginTextBox.Text,
+                Sector = SectorTextBox.Text,
+                Id = IdTextBox.Text,
                 DateAdded = DateTime.Now
             };
 
@@ -47,8 +47,8 @@ namespace PlantPassportGenerator
             if (PlantDataGrid.SelectedItem is PlantPassport selectedPassport)
             {
                 selectedPassport.PlantName = PlantNameTextBox.Text;
-                selectedPassport.Species = SpeciesTextBox.Text;
-                selectedPassport.Origin = OriginTextBox.Text;
+                selectedPassport.Sector = SectorTextBox.Text;
+                selectedPassport.Id = IdTextBox.Text;
                 _jsonDatabaseService.SaveData(_plantPassports);
                 PlantDataGrid.Items.Refresh();
             }
@@ -69,39 +69,39 @@ namespace PlantPassportGenerator
             if (PlantDataGrid.SelectedItem is PlantPassport selectedPassport)
             {
                 PlantNameTextBox.Text = selectedPassport.PlantName;
-                SpeciesTextBox.Text = selectedPassport.Species;
-                OriginTextBox.Text = selectedPassport.Origin;
+                SectorTextBox.Text = selectedPassport.Sector;
+                IdTextBox.Text = selectedPassport.Id;
             }
         }
 
 
 
-private void PrintButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (PlantDataGrid.SelectedItems.Count > 0)
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
-            PdfDocument document = new PdfDocument();
-            document.Info.Title = "Plant Passports";
-
-            foreach (PlantPassport passport in PlantDataGrid.SelectedItems)
+            if (PlantDataGrid.SelectedItems.Count > 0)
             {
-                PdfPage page = document.AddPage();
-                XGraphics gfx = XGraphics.FromPdfPage(page);
+                PdfDocument document = new PdfDocument();
+                document.Info.Title = "Plant Passports";
+
+                foreach (PlantPassport passport in PlantDataGrid.SelectedItems)
+                {
+                    PdfPage page = document.AddPage();
+                    XGraphics gfx = XGraphics.FromPdfPage(page);
                     XFont font = new XFont("Verdana", 20, XFontStyleEx.Bold);
-                gfx.DrawString("Plant Passport", font, XBrushes.Black, new XRect(0, 0, page.Width, 50), XStringFormats.TopCenter);
-                gfx.DrawString($"ID: {passport.Id}", font, XBrushes.Black, new XRect(40, 60, page.Width, 0));
-                gfx.DrawString($"Plant Name: {passport.PlantName}", font, XBrushes.Black, new XRect(40, 100, page.Width, 0));
-                gfx.DrawString($"Species: {passport.Species}", font, XBrushes.Black, new XRect(40, 140, page.Width, 0));
-                gfx.DrawString($"Origin: {passport.Origin}", font, XBrushes.Black, new XRect(40, 180, page.Width, 0));
-                gfx.DrawString($"Date Added: {passport.DateAdded}", font, XBrushes.Black, new XRect(40, 220, page.Width, 0));
+                    gfx.DrawString("Plant Passport", font, XBrushes.Black, new XRect(0, 0, page.Width, 50), XStringFormats.TopCenter);
+                    gfx.DrawString($"ID: {passport.Id}", font, XBrushes.Black, new XRect(40, 60, page.Width, 0));
+                    gfx.DrawString($"Plant Name: {passport.PlantName}", font, XBrushes.Black, new XRect(40, 100, page.Width, 0));
+                    gfx.DrawString($"Species: {passport.Id}", font, XBrushes.Black, new XRect(40, 140, page.Width, 0));
+                    gfx.DrawString($"Origin: {passport.Sector}", font, XBrushes.Black, new XRect(40, 180, page.Width, 0));
+                    gfx.DrawString($"Date Added: {passport.DateAdded}", font, XBrushes.Black, new XRect(40, 220, page.Width, 0));
 
                 }
 
                 string filename = "PlantPassports.pdf";
-            document.Save(filename);
-            MessageBox.Show($"PDF saved as {filename}");
+                document.Save(filename);
+                MessageBox.Show($"PDF saved as {filename}");
+            }
         }
-    }
-
-}
+    }   
+    
 }
