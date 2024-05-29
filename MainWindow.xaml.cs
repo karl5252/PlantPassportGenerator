@@ -15,6 +15,7 @@ namespace PlantPassportGenerator
     {
         private List<PlantPassport> _plantPassports;
         private List<string> _sectors;
+        private List<BasketItem> _basket;
         private JsonDatabaseService _jsonDatabaseService;
         private const string DatabaseFilePath = "plant_passports.json";
         private const string SectorsFilePath = "sectors.json";
@@ -25,18 +26,14 @@ namespace PlantPassportGenerator
             InitializeComponent();
             _jsonDatabaseService = new JsonDatabaseService(DatabaseFilePath);
             _plantPassports = _jsonDatabaseService.LoadData();
+            _basket = new List<BasketItem>();
 
             _collectionViewSource = new CollectionViewSource { Source = _plantPassports };
             _collectionViewSource.Filter += CollectionViewSource_Filter;
             PlantDataGrid.ItemsSource = _collectionViewSource.View;
 
             LoadSectors();
-
-            // Ensure FilterTextBox is empty or has only placeholder text
-            FilterTextBox.Text = string.Empty;
-
-            // Refresh the CollectionViewSource
-            _collectionViewSource.View.Refresh();
+            BasketListBox.ItemsSource = _basket;
         }
 
         private void LoadSectors()
@@ -131,6 +128,48 @@ namespace PlantPassportGenerator
             }
         }
 
+        private void PlantDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (PlantDataGrid.SelectedItem is PlantPassport selectedPassport)
+            {
+                var basketItem = _basket.FirstOrDefault(item => item.PlantName == selectedPassport.PlantName);
+                if (basketItem != null)
+                {
+                    basketItem.Count++;
+                }
+                else
+                {
+                    _basket.Add(new BasketItem { PlantName = selectedPassport.PlantName, Count = 1 });
+                }
+                BasketListBox.Items.Refresh();
+            }
+        }
+
+        private void IncrementCountButton_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as Button)?.DataContext is BasketItem basketItem)
+            {
+                basketItem.Count++;
+                BasketListBox.Items.Refresh();
+            }
+        }
+
+        private void DecrementCountButton_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as Button)?.DataContext is BasketItem basketItem)
+            {
+                if (basketItem.Count > 1)
+                {
+                    basketItem.Count--;
+                }
+                else
+                {
+                    _basket.Remove(basketItem);
+                }
+                BasketListBox.Items.Refresh();
+            }
+        }
+
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
             PdfDocument document = new PdfDocument();
@@ -144,30 +183,37 @@ namespace PlantPassportGenerator
             XFont font = new XFont("Verdana", 10, XFontStyleEx.Regular);
             XFont boldFont = new XFont("Verdana", 10, XFontStyleEx.Bold);
 
-            foreach (PlantPassport passport in BasketListBox.Items)
+            foreach (var basketItem in _basket)
             {
-                if (passportCounter % passportsPerPage == 0)
+                for (int i = 0; i < basketItem.Count; i++)
                 {
-                    page = document.AddPage();
-                    page.Size = PdfSharp.PageSize.A4;
-                    gfx = XGraphics.FromPdfPage(page);
+                    var passport = _plantPassports.FirstOrDefault(p => p.PlantName == basketItem.PlantName);
+
+                    if (passport == null) continue;
+
+                    if (passportCounter % passportsPerPage == 0)
+                    {
+                        page = document.AddPage();
+                        page.Size = PdfSharp.PageSize.A4;
+                        gfx = XGraphics.FromPdfPage(page);
+                    }
+
+                    int row = (passportCounter % passportsPerPage) / 3;
+                    int column = (passportCounter % passportsPerPage) % 3;
+
+                    double x = 40 + column * (210 + 20); // 2.5cm (around 70 points) + 5cm (around 140 points)
+                    double y = 40 + row * (100 + 20); // 2.5cm (around 70 points) + 5cm (around 140 points)
+
+                    gfx.DrawString("EU", boldFont, XBrushes.Black, new XRect(x, y, 70, 20), XStringFormats.TopLeft);
+                    gfx.DrawString("Paszport rolin / Plant passport", font, XBrushes.Black, new XRect(x + 70, y, 140, 20), XStringFormats.TopLeft);
+
+                    gfx.DrawString($"A: {passport.PlantName}", font, XBrushes.Black, new XRect(x, y + 20, 210, 20), XStringFormats.TopLeft);
+                    gfx.DrawString($"B: {passport.Id}", font, XBrushes.Black, new XRect(x, y + 40, 210, 20), XStringFormats.TopLeft);
+                    gfx.DrawString($"C: {passport.Sector} / {DateTime.Now.Year}", font, XBrushes.Black, new XRect(x, y + 60, 210, 20), XStringFormats.TopLeft);
+                    gfx.DrawString("D: PL", font, XBrushes.Black, new XRect(x, y + 80, 210, 20), XStringFormats.TopLeft);
+
+                    passportCounter++;
                 }
-
-                int row = (passportCounter % passportsPerPage) / 3;
-                int column = (passportCounter % passportsPerPage) % 3;
-
-                double x = 40 + column * (210 + 20); // 2.5cm (around 70 points) + 5cm (around 140 points)
-                double y = 40 + row * (100 + 20); // 2.5cm (around 70 points) + 5cm (around 140 points)
-
-                gfx.DrawString("EU", boldFont, XBrushes.Black, new XRect(x, y, 70, 20), XStringFormats.TopLeft);
-                gfx.DrawString("Paszport rolin / Plant passport", font, XBrushes.Black, new XRect(x + 70, y, 140, 20), XStringFormats.TopLeft);
-
-                gfx.DrawString($"A: {passport.PlantName}", font, XBrushes.Black, new XRect(x, y + 20, 210, 20), XStringFormats.TopLeft);
-                gfx.DrawString($"B: {passport.Id}", font, XBrushes.Black, new XRect(x, y + 40, 210, 20), XStringFormats.TopLeft);
-                gfx.DrawString($"C: {passport.Sector} / {DateTime.Now.Year}", font, XBrushes.Black, new XRect(x, y + 60, 210, 20), XStringFormats.TopLeft);
-                gfx.DrawString("D: PL", font, XBrushes.Black, new XRect(x, y + 80, 210, 20), XStringFormats.TopLeft);
-
-                passportCounter++;
             }
 
             string filename = "PlantPassports.pdf";
@@ -192,7 +238,7 @@ namespace PlantPassportGenerator
                 {
                     e.Accepted = passport.PlantName.IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
                                  passport.Id.ToString().IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                                 passport.Sector?.IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0;
+                                 passport.Sector.IndexOf(FilterTextBox.Text, StringComparison.OrdinalIgnoreCase) >= 0;
                 }
             }
         }
@@ -212,6 +258,12 @@ namespace PlantPassportGenerator
         public string PlantName { get; set; }
         public string Sector { get; set; }
         public DateTime DateAdded { get; set; } = DateTime.Now;
+    }
+
+    public class BasketItem
+    {
+        public string PlantName { get; set; }
+        public int Count { get; set; }
     }
 
     public class JsonDatabaseService

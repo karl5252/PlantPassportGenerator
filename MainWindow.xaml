@@ -36,16 +36,27 @@
         <!-- Printing Basket -->
         <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Vertical" Margin="10">
             <TextBlock Text="Basket" Margin="5"/>
-            <ListBox x:Name="BasketListBox" Margin="5"/>
+            <ListBox x:Name="BasketListBox" Margin="5">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding PlantName}" Width="150" />
+                            <TextBlock Text="{Binding Count}" Width="50" HorizontalAlignment="Center" />
+                            <Button Content="+" Width="20" Click="IncrementCountButton_Click" />
+                            <Button Content="-" Width="20" Click="DecrementCountButton_Click" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
             <Button x:Name="PrintButton" Content="Print" Click="PrintButton_Click" Margin="5"/>
         </StackPanel>
-
+        
         <!-- Filter Box -->
         <TextBox Grid.ColumnSpan="3" Grid.Row="1" Margin="10" x:Name="FilterTextBox" Text="" TextChanged="FilterTextBox_TextChanged"/>
 
         <!-- DataGrid for Plant Passports -->
         <ScrollViewer Grid.ColumnSpan="3" Grid.Row="2" Margin="10">
-            <DataGrid x:Name="PlantDataGrid" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="PlantDataGrid_SelectionChanged">
+            <DataGrid x:Name="PlantDataGrid" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="PlantDataGrid_SelectionChanged" MouseDoubleClick="PlantDataGrid_MouseDoubleClick" Height="328">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="150"/>
                     <DataGridTextColumn Header="Plant Name" Binding="{Binding PlantName}" Width="250"/>
