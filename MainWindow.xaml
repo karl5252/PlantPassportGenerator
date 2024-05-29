@@ -50,7 +50,7 @@
             </ListBox>
             <Button x:Name="PrintButton" Content="Print" Click="PrintButton_Click" Margin="5"/>
         </StackPanel>
-        
+
         <!-- Filter Box -->
         <TextBox Grid.ColumnSpan="3" Grid.Row="1" Margin="10" x:Name="FilterTextBox" Text="" TextChanged="FilterTextBox_TextChanged"/>
 
