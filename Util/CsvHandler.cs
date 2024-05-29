@@ -8,6 +8,7 @@ using PlantPassportGenerator;
 using System.Globalization;
 using WpfApp1.Model;
 using System;
+using System.Linq;
 
 namespace WpfApp1.Util
 {
@@ -37,6 +38,8 @@ namespace WpfApp1.Util
                         var records = csv.GetRecords<PlantPassport>();
                         List<PlantPassport> data = new List<PlantPassport>(records);
                         _mainWindow.UpdatePlantPassports(data);
+                        // we need to extract from data Sectors and update them
+                        _mainWindow.UpdatePlantSectors(data.Select(p => p.Sector).Distinct().ToList());
 
                         File.WriteAllText(jsonFilePath, JsonConvert.SerializeObject(data, Formatting.Indented));
                     }
