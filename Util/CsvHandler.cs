@@ -7,6 +7,7 @@ using CsvHelper;
 using PlantPassportGenerator;
 using System.Globalization;
 using WpfApp1.Model;
+using System.Linq;
 
 namespace WpfApp1.Util
 {
@@ -19,31 +20,39 @@ namespace WpfApp1.Util
             _mainWindow = mainWindow;
         }
 
-            public void ImportCsv(object sender, RoutedEventArgs e)
+        public void ImportCsv(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "CSV files (*.csv)|*.csv";
+            if (openFileDialog.ShowDialog() == true)
             {
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "CSV files (*.csv)|*.csv";
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    string csvFilePath = openFileDialog.FileName;
-                    string jsonFilePath = Path.ChangeExtension(csvFilePath, ".json");
+                string csvFilePath = openFileDialog.FileName;
+                string jsonFilePath = Path.ChangeExtension(csvFilePath, ".json");
 
-                using (var reader = new StreamReader(csvFilePath))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                try
                 {
-                    var records = csv.GetRecords<PlantPassport>();
-                    List<PlantPassport> data = new List<PlantPassport>(records);
-                    _mainWindow.UpdatePlantPassports(data);
+                    using (var reader = new StreamReader(csvFilePath))
+                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                    {
+                        csv.Context.RegisterClassMap<PlantPassportMap>();
+                        var records = csv.GetRecords<PlantPassport>().ToList();
+                        _mainWindow.UpdatePlantPassports(records);
 
-                    File.WriteAllText(jsonFilePath, JsonConvert.SerializeObject(data, Formatting.Indented));
+                        File.WriteAllText(jsonFilePath, JsonConvert.SerializeObject(records, Formatting.Indented));
+                    }
                 }
-                
+                catch (CsvHelperException ex)
+                {
+                    MessageBox.Show($"Error importing CSV: {ex.Message}\nPlease ensure all fields are filled, even with placeholder data.", "Import Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-    }
-        
+        }
 
-    private void ExportToCSV_Click(object sender, RoutedEventArgs e)
+
+
+        private void ExportToCSV_Click(object sender, RoutedEventArgs e)
     {
+            
         // Implement CSV export functionality here
     }
 

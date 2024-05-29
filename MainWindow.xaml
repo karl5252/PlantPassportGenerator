@@ -58,6 +58,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
             <Button x:Name="PrintButton" Content="Print" Click="PrintButton_Click" Margin="5"/>
+            <Button x:Name="CleanBasketButton" Content="Clean Basket" Click="CleanButton_Click" Margin="5"/>
         </StackPanel>
 
         <!-- Filter Box -->
