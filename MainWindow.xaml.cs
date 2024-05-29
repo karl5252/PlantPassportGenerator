@@ -17,6 +17,7 @@ namespace PlantPassportGenerator
         private List<string> _sectors;
         private List<BasketItem> _basket;
         private JsonDatabaseService _jsonDatabaseService;
+        private CsvHandler _csvHandler;
         private const string DatabaseFilePath = "plant_passports.json";
         private const string SectorsFilePath = "sectors.json";
         private CollectionViewSource _collectionViewSource;
@@ -27,6 +28,8 @@ namespace PlantPassportGenerator
             _jsonDatabaseService = new JsonDatabaseService(DatabaseFilePath);
             _plantPassports = _jsonDatabaseService.LoadData();
             _basket = new List<BasketItem>();
+
+            _csvHandler = new CsvHandler(this); // Pass the MainWindow instance to the CsvHandler
 
             _collectionViewSource = new CollectionViewSource { Source = _plantPassports };
             _collectionViewSource.Filter += CollectionViewSource_Filter;
@@ -206,7 +209,19 @@ namespace PlantPassportGenerator
                 _collectionViewSource.View.Refresh();
             }
         }
+
+        private void ImportFromCSV_Click(object sender, RoutedEventArgs e)
+        {
+
+            _csvHandler.ImportCsv(sender, e);
+        }
+
+        private void ExportToCSV_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+            // Implement CSV export functionality here
+        }
     }
 
-   
+
 }
